@@ -4,7 +4,6 @@ var ClarityTemplates = ClarityTemplates || false;
 
 //todo:event handlers seem randomly scattered.
 (function ($) {
-
     var ClarityPlayer = function ($anchor, myPlaylist, userOptions) {
         //Boulevard globals
         var $self = $anchor, isStarted = false, evtMgr, id, defaultOptions, options, cssSelector, playlist,
@@ -483,7 +482,7 @@ var ClarityTemplates = ClarityTemplates || false;
                 //     imageObj.src = src;
                 // }
                 // currentImage = imageObj;
-                $('.player-background-outer').backgroundBlur(myPlaylist[current].background);
+                $('.player-background-outer').backgroundBlur(myPlaylist[current].background,90);
                 return loading;
             }
 
