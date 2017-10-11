@@ -1,7 +1,8 @@
 //variables that are shared across instances of the plugin
 var ClarityDependenciesLoaded = ClarityDependenciesLoaded || false;
 var ClarityTemplates = ClarityTemplates || false;
-
+var time = 0;
+pauseSong = {};
 //todo:event handlers seem randomly scattered.
 (function ($) {
     var ClarityPlayer = function ($anchor, myPlaylist, userOptions) {
@@ -67,12 +68,10 @@ var ClarityTemplates = ClarityTemplates || false;
             smallScreenSize:640,
             imageEffects:false,
             groupAlbumCoversInMiddle:true,
-            additionalLayoutConfigs:[{layout:'album-cover-and-list'},{layout:'list'}],
+            additionalLayoutConfigs:[{layout:'album-cover-and-list'},{layout:'list'},{layout:'album-cover-and-lrc'}],
             autoStart:true,
             baseLayout:false
         };
-
-
 
         $.fn.onThrottled = function (eventName, interval, handler) {
             var eventQueued = false;
@@ -187,21 +186,52 @@ var ClarityTemplates = ClarityTemplates || false;
                         playlistNext();
                     });
 
-                    $myJplayer.bind($.jPlayer.event.play, function () {
+                    $myJplayer.bind($.jPlayer.event.play, function (event) {
                         $myJplayer.jPlayer("pauseOthers");
+                        var media = event.jPlayer.status.media;
+                        if (media.id === pauseSong.id) {
+                            pauseSong = {};
+                            return;
+                        }
+                        pauseSong = {};
+                        loadLrc(event.jPlayer.status.media.id,event.jPlayer.status.media.title,event.jPlayer.status.media.artist)
                     });
 
-                    $myJplayer.bind($.jPlayer.event.playing, function () {
+                    $myJplayer.bind($.jPlayer.event.playing, function (event) {
+                        document.title = '正在播放:' + myPlaylist[current].title + " - " +myPlaylist[current].artist + "...";
+                        enableRollTitle = true;
                         playing = true;
                     });
 
-                    $myJplayer.bind($.jPlayer.event.pause, function () {
+                    $myJplayer.bind($.jPlayer.event.pause, function (event) {
+                        document.title = 'JoyMusic | JoyLau Simple Music';
+                        enableRollTitle = false;
+
+                        var media = event.jPlayer.status.media;
+                        pauseSong = {id:media.id,timeupdate:event.jPlayer.status.currentTime};
+
                         playing = false;
+                    });
+
+                    $myJplayer.bind($.jPlayer.event.timeupdate, function (event) {
+                        if(event.jPlayer.currentTime===0){
+                            time = 0;
+                        }else {
+                            time = event.jPlayer.status.currentTime;
+                        }
+                    });
+
+                    $myJplayer.bind($.jPlayer.event.error, function (event) {
+                        switch(event.jPlayer.error.type) {
+                            case $.jPlayer.error.URL:
+                                alert("抱歉,该歌曲因版权或会员限制，无法播放，听听下一首吧~");
+                                playlistNext();
+                                break;
+                        }
                     });
 
                     //Bind next/prev click events
                     $self.find(cssSelector.playerPrevious).on('click', function () {
-
                         playlistPrev();
                         $(this).blur();
                         return false;
@@ -482,7 +512,7 @@ var ClarityTemplates = ClarityTemplates || false;
                 //     imageObj.src = src;
                 // }
                 // currentImage = imageObj;
-                $('.player-background-outer').backgroundBlur(myPlaylist[current].background,90);
+                $('.player-background-outer').backgroundBlur(myPlaylist[current].background);
                 return loading;
             }
 
@@ -964,6 +994,12 @@ var ClarityTemplates = ClarityTemplates || false;
                 });
 
 
+                defineLayout('album-cover-and-lrc', {
+                    init:function () {
+                        loadLrc(myPlaylist[current].id,myPlaylist[current].title,myPlaylist[current].artist)
+                    }
+                });
+
                 defineLayout('single-album-cover', {
                     init:function () {
                         albumCoverManager.setAlbumCoverLayout('single');
@@ -1427,8 +1463,10 @@ var ClarityTemplates = ClarityTemplates || false;
         };
 
         AlbumCoverManager.prototype.handleAlbumCoverClick = function ($cover) {
-            if (this.albumCoverLayout == 'single')
+            if (this.albumCoverLayout == 'single'){
+                switchLayoutAndBackground({layout: "album-cover-and-lrc"});
                 return;
+            }
 
             var albumCover = $cover.parent().data('cover');
 
@@ -1917,7 +1955,7 @@ var ClarityTemplates = ClarityTemplates || false;
         }
 
         function showLoadingScreen() {
-            $loading = $('<div class="blvd-loading"><div>JoyMusic</div></div>').height($self.outerHeight());
+            $loading = $('<div class="blvd-loading"><div><img draggable="false" src="http://music.joylau.cn/images/logo.png" width="60" height="60"/><br>JoyMusic</div></div>').height($self.outerHeight());
 
             $self.append($loading);
         }
@@ -2001,7 +2039,6 @@ var ClarityTemplates = ClarityTemplates || false;
 
                     switchLayoutAndBackground(listOfLayouts[currentLayoutIndex]);
                 });
-
 
                 hideLoadingScreen();
 
@@ -2239,5 +2276,33 @@ var ClarityTemplates = ClarityTemplates || false;
     $.fn.ttwClarityPlayer = function (myPlaylist, userOptions) {
         return new ClarityPlayer(this, myPlaylist, userOptions);
     };
-
 })(jQuery);
+
+function conventMin(millisecond) {
+    var time = parseFloat(millisecond) / 1000;
+    if (time) {
+        if (time > 60 && time < 60 * 60) {
+            time = parseInt(time / 60.0) + "'" + parseInt((parseFloat(time / 60.0) - parseInt(time / 60.0)) * 60) + "\"";
+        } else if (time >= 60 * 60 && time < 60 * 60 * 24) {
+            time = parseInt(time / 3600.0) + "h" + parseInt((parseFloat(time / 3600.0) - parseInt(time / 3600.0)) * 60) + "m" + parseInt((parseFloat((parseFloat(time / 3600.0) - parseInt(time / 3600.0)) * 60) - parseInt((parseFloat(time / 3600.0) - parseInt(time / 3600.0)) * 60)) * 60) + "s";
+        } else {
+            time = parseInt(time) + "\"";
+        }
+    }
+    return time;
+}
+
+function loadLrc(id, title, artist) {
+    $.getJSON('http://music.joylau.cn/apis/v1/song/getSongLrc/'+ id,function (data) {
+        $('#song-name-artist').text(title + '-' +artist);
+        var lrc;
+        if (data.nolyric) {
+            lrc = ' ';
+        } else {
+            lrc = data.lrc.lyric;
+        }
+        $.lrc.start(lrc, function() {
+            return time;
+        });
+    });
+}

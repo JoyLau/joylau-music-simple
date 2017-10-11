@@ -37,6 +37,20 @@
     </div>
   </div>
 </div>
+<div id="album-cover-and-lrc">
+  <div class="player-layout">
+    <div class="player-layout-inner">
+      <div class="album-covers-wrapper">
+        <h3 id="song-name-artist" class="song-name-artist"></h3>
+        <div id="lrc_area" class="lrc_area" onclick="changeLayout()">
+          <ul id="lrc_list" class="lrc_list "></ul>
+          <div id="lrc_nofound" class="lrc_nofound ">暂无歌词</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
 <div id="list">
   <div class="player-layout">
     <div class="player-layout-inner">
@@ -84,7 +98,7 @@
         <span class="unused-controls"> <span class="jp-video-play"></span> <span class="jp-stop"></span> <span class="jp-mute"></span> <span class="jp-unmute"></span> <span class="jp-volume-bar"></span> <span class="jp-volume-bar-value"></span> <span class="jp-volume-max"></span> <span class="jp-playback-rate-bar"></span> <span class="jp-playback-rate-bar-value"></span> <span class="jp-no-solution"></span> <span class="jp-full-screen"></span> <span class="jp-restore-screen"></span> <span class="jp-repeat"></span> <span class="jp-repeat-off"></span> <span class="jp-gui"></span> </span> </div>
       <div class="player-right">
         <div class="volume player-button" data-level="high"></div>
-        <div class="toggle-layout player-button"></div>
+        <div class="toggle-layout player-button" title="切换模式"></div>
         <div class="show-album-covers playlist-toggle-button player-button"></div>
       </div>
     </div>

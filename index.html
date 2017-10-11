@@ -1,22 +1,24 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>jQuery音乐播放器插件</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+    <meta name="description" content="JoyLau, joylau, JoyMusic, music" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>JoyMusic | JoyLau Simple Music</title>
     <link rel="stylesheet" href="css/style.css"/>
     <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="icon" href="http://music.joylau.cn/favicon.ico"/>
 </head>
 <body>
 <div id="example-wrapper">
-    <ul id="example-size-picker">
+    <ul id="example-size-picker" style="display: none">
         <li data-size="mobile">Mobile</li>
         <li data-size="large">Large</li>
         <li data-size="full">Full Screen</li>
     </ul>
     <div id="example-outer">
         <div id="example" data-size="full">
-
         </div>
     </div>
 </div>
@@ -24,36 +26,67 @@
 <script src="js/ttw-clarity-player.js"></script>
 <script src="js/yepnope.js"></script>
 <script src="js/background-blur.min.js"></script>
+<script src="http://music.joylau.cn/js/jPlayer/lrc.js"></script>
 <script type="text/javascript">
-    var clarity;
-    $(function () {
-        var myPlaylist = [];
-        $.getJSON("http://music.joylau.cn/apis/v1/playList/detail/307243535", function (data) {
-            $.each(data.result.tracks,function (i,e){
-                myPlaylist.push({
-                    mp3:'http://music.163.com/song/media/outer/url?id='+e.id,
-                    duration:'3:49',
-                    cover:e.album.picUrl+'?param=500y500',
-                    background:e.album.picUrl,
-                    title:e.name,
-                    artist:e.artists[0].name,
-                })
-            });
-            clarity = $('#example').ttwClarityPlayer(myPlaylist,{
-                jPlayer:{
-                    supplied:'mp3',
-                    errorAlerts:true,
-                    autoPlay:true,
-                    warningAlerts:true,
-                    consoleAlerts:true
-                }
-            });
+    var enableRollTitle = false,
+        taskId,
+        step = 0,
+        clarity,
+        myPlaylist = [];
+    $.getJSON("http://music.joylau.cn/apis/v1/playList/detail/307243535", function (data) {
+        $.each(data.result.tracks,function (i,e){
+            myPlaylist.push({
+                id:e.id,
+                mp3:'http://music.163.com/song/media/outer/url?id='+e.id,
+                duration:conventMin(e.duration),
+                cover:e.album.picUrl+'?param=500y500',
+                background:e.album.picUrl,
+                title:e.name,
+                artist:getArtists(e.artists),
+            })
         });
-		$('#example-size-picker').on('click', 'li', function(){
-            $('#example').attr('data-size', $(this).data('size'));
-            clarity.manageLayout();
+        clarity = $('#example').ttwClarityPlayer(myPlaylist,{
+            jPlayer:{
+                supplied:'mp3',
+                errorAlerts:true,
+                autoPlay:true,
+                warningAlerts:true,
+                consoleAlerts:true
+            }
         });
     });
+    $('#example-size-picker').on('click', 'li', function(){
+        $('#example').attr('data-size', $(this).data('size'));
+        clarity.manageLayout();
+    });
+
+    function getArtists(data) {
+        var artist = "";
+        $.each(data,function (i,e){
+            artist = artist + e.name + " ";
+        });
+        return artist;
+    }
+
+    rollTitle();
+    function rollTitle() {
+        clearTimeout(taskId);
+        if (enableRollTitle){
+            var title = document.title;//获取网页标题
+            //根据时间每次将切割后前面的字加到后面，直到step比标题个数还大，重新开始
+            document.title = title.substring(step, title.length) + title.substring(0, step);
+            step++;
+            if (step >  title.length) step = 0;
+        }
+        taskId = setTimeout('rollTitle()',1000);
+    }
+
+    function changeLayout() {
+        if ($(window).width() > 768 ) {
+            return;
+        }
+        clarity.manageLayout();
+    }
 </script>
 </body>
 </html>

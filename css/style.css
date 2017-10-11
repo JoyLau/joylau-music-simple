@@ -186,10 +186,19 @@
   line-height: 40px;
 }
 .track-list-wrapper .playing {
-  background: transparent url(../images/now-playing-list-indicator.png) no-repeat 10px center;
+   position: relative;
+   -webkit-box-shadow: 0 0 60px 0 rgba(0, 0, 0, 0.4);
+  box-shadow: inset -7px -6px 60px 0 rgba(25, 20, 20, 0.4);
 }
 .track-list-wrapper .playing .track-number {
-  display: none;
+  position: absolute;
+  top: 50%;
+  margin-top: -5px;
+  width: 10px;
+  height: 10px;
+  background: url(../images/wave.gif) 0 0 no-repeat;
+  text-indent: -99px;
+  overflow: hidden;
 }
 .player-controls {
   padding: 0 20px;
@@ -535,6 +544,42 @@ forced-mini-height [data-style-type="blur-player"] .general-background {
 }
 [data-layout="album-cover-and-list"] .track-list {
   margin-left: 2.5%;
+}
+[data-layout="album-cover-and-lrc"] .album-covers-wrapper {
+  height: 100%;
+}
+[data-layout="album-cover-and-lrc"] .player-layout-inner {
+  padding-top: 0;
+}
+[data-layout="album-cover-and-lrc"] .song-name-artist {
+  text-align: center;
+  padding-top: 50px;
+  color: #31c27c;
+  font-size: 28px;
+}
+[data-layout="album-cover-and-lrc"] .lrc_area {
+  height: 50%;
+  overflow: hidden;
+  margin-top: 10%;
+  -webkit-mask-image: linear-gradient(to bottom,rgba(255,255,255,0) 0,rgba(255,255,255,.6) 15%,rgba(255,255,255,1) 25%,rgba(255,255,255,1) 75%,rgba(255,255,255,.6) 85%,rgba(255,255,255,0) 100%);
+}
+[data-layout="album-cover-and-lrc"] .lrc_list {
+  padding: 0;
+}
+[data-layout="album-cover-and-lrc"] .lrc_list li {
+  text-align: center;
+  font-size: 22px;
+  line-height: 58px;
+  color: #fff;
+  list-style:none
+}
+[data-layout="album-cover-and-lrc"] .lrc_list li.hover {
+  color:#31c27c;
+  font-weight:bold;
+}
+[data-layout="album-cover-and-lrc"] .lrc_nofound {
+  text-align: center;
+  margin-top: 5%;
 }
 [data-layout="list"] .player-layout-inner {
   padding-top: 0;
