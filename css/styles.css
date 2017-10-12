@@ -9,9 +9,8 @@ body, html, #example-wrapper{
     width:100%;
     padding:0;
     margin:0;
-    font-family:sans-serif;
+    font-family: "Source Sans Pro","microsoft yahei", sans-serif;
 }
-
 #example-size-picker{
     position:absolute;
     z-index: 2;

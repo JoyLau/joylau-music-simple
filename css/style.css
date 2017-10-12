@@ -7,10 +7,6 @@
 }
 .player-container {
   position: relative;
-  font-family: sans-serif;
-}
-.player-layout {
-  font-family: arial, sans-serif;
 }
 .ellipsis {
   text-overflow: ellipsis;
