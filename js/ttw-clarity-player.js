@@ -2296,7 +2296,7 @@ function loadLrc(id, title, artist) {
     $.getJSON('http://music.joylau.cn/apis/v1/song/getSongLrc/'+ id,function (data) {
         $('#song-name-artist').text(title + '-' +artist);
         var lrc;
-        if (data.nolyric) {
+        if (data.nolyric || data.lrc.lyric) {
             lrc = ' ';
         } else {
             lrc = data.lrc.lyric;
